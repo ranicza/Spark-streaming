@@ -202,7 +202,7 @@ public class SparkStreamApp {
 	               config = HBaseConfiguration.create();
 	               config.set("hbase.zookeeper.quorum", "127.0.0.1");
 	               config.set("hbase.zookeeper.property.clientPort","2181");
-	               config.set("hbase.master", "127.0.0.1:60000");
+	             //  config.set("hbase.master", "127.0.0.1:60000");
 	               HBaseAdmin.checkHBaseAvailable(config);
 	               System.out.println("HBase is running!");
 	             } 
