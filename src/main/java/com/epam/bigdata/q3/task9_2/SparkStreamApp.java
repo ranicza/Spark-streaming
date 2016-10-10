@@ -27,19 +27,16 @@ import org.spark_project.guava.collect.HashBasedTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.MasterNotRunningException;
-import org.apache.hadoop.hbase.client.HBaseAdmin;
+
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
-import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
-import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
+
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.Job;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.client.HTable;
-import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import scala.Tuple2;
@@ -217,11 +214,12 @@ public class SparkStreamApp {
 	                } catch (IOException e) {
 	                    System.out.println("IOException" + e.getMessage());
 	                }
-	                System.out.println("#1 " + tuple2.toString());
+	                System.out.println("write to table: " + tuple2.toString());
 	                return new String(tuple2._2());
 	        });
+	        
 	        JavaDStream<String> lines1 = messages.map(tuple2 -> {
-	            System.out.println("#1 " + tuple2.toString());
+	            System.out.println("#lines1: " + tuple2.toString());
 	            return tuple2._2();
 	        });
 
