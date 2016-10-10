@@ -205,7 +205,7 @@ public class SparkStreamApp {
 //	               config.set("hbase.master", "127.0.0.1:60000");
 //	               config.set("zookeeper.znode.parent", "/hbase-unsecure");
 	               HBaseAdmin.checkHBaseAvailable(config);
-	               System.out.println("HBase is running!");
+	               System.out.println("---------------------HBASE IS RUNNING!!!---------------------------");
 	             } 
 	        catch (MasterNotRunningException e) {
 	                    System.out.println("HBase is not running!");
