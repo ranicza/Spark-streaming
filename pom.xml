@@ -45,6 +45,19 @@
 		    <artifactId>hbase</artifactId>
 		    <version>0.90.2</version>
 		</dependency>
+		
+		        <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-common</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+        
+                <dependency>
+            <groupId>org.apache.hbase</groupId>
+            <artifactId>hbase-client</artifactId>
+            <version>1.2.3</version>
+        </dependency>
+    
         
   </dependencies>
   

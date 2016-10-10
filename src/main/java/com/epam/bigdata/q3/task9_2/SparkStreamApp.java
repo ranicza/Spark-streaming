@@ -1,5 +1,6 @@
 package com.epam.bigdata.q3.task9_2;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -27,12 +28,19 @@ import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.MasterNotRunningException;
 import org.apache.hadoop.hbase.client.HBaseAdmin;
+import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.hadoop.hbase.mapreduce.TableInputFormat;
 import org.apache.hadoop.hbase.mapreduce.TableOutputFormat;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.apache.hadoop.mapreduce.Job;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.hbase.HBaseConfiguration;
+import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
+import org.apache.hadoop.hbase.util.Bytes;
 
 import scala.Tuple2;
 
@@ -63,7 +71,7 @@ public class SparkStreamApp {
 	        String group = args[2];
 	        String[] topics = args[3].split(",");
 	        int numThreads = Integer.parseInt(args[4]);
-	        String table = args[5];
+	        String tableName = args[5];
 	        String columnFamily = args[6];
 
 	        SparkConf sparkConf = new SparkConf().setAppName("SparkStreamingApp")
@@ -196,6 +204,32 @@ public class SparkStreamApp {
 	        
 	//----------------------------------------------------------------------------
 
+	        JavaDStream<String> lines = messages.map(tuple2 -> {
+	            Configuration conf = HBaseConfiguration.create();
+	            conf.set("hbase.zookeeper.property.clientPort", "2181");
+	            conf.set("hbase.zookeeper.quorum", "sandbox.hortonworks.com");
+	            conf.set("zookeeper.znode.parent", "/hbase-unsecure");
+	            HTable table = new HTable(conf, "logs_file");
+	                Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
+	                put.add(Bytes.toBytes("details"), Bytes.toBytes("logs_file"), Bytes.toBytes(tuple2._2()));
+	                try {
+	                    table.put(put);
+	                } catch (IOException e) {
+	                    System.out.println("IOException" + e.getMessage());
+	                }
+	                System.out.println("#1 " + tuple2.toString());
+	                return new String(tuple2._2());
+	        });
+	        JavaDStream<String> lines1 = messages.map(tuple2 -> {
+	            System.out.println("#1 " + tuple2.toString());
+	            return tuple2._2();
+	        });
+
+	        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
+	        JavaPairDStream<String, Integer> wordCounts = words
+	                .mapToPair(s -> new Tuple2<>(s, 1))
+	                .reduceByKey((i1,i2) -> i1 + i2);
+	        /*
 	        // create connection with HBase
 	        Configuration config = null;
 	        try {
@@ -253,15 +287,15 @@ public class SparkStreamApp {
                 }
             });
             
-            */
+        
 	        
 	        hbasePuts.foreachRDD(hbasePutJavaPairRDD -> {
                     hbasePutJavaPairRDD.saveAsNewAPIHadoopDataset(newAPIJobConfiguration1.getConfiguration());  
             });
-	        
+	            */
 	        
 
-	      //  wordCounts.print();
+	        wordCounts.print();
 	        jssc.start();
 	        jssc.awaitTermination();
 	   
