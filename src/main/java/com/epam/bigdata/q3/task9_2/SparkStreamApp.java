@@ -3,40 +3,24 @@ package com.epam.bigdata.q3.task9_2;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.spark.streaming.*;
 
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.api.java.function.Function;
-import org.apache.spark.api.java.function.Function2;
-import org.apache.spark.api.java.function.PairFunction;
-import org.apache.spark.api.java.function.VoidFunction;
-import org.apache.spark.sql.Row;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaPairReceiverInputDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka.KafkaUtils;
-import org.spark_project.guava.collect.HashBasedTable;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.hbase.HBaseConfiguration;
-import org.apache.hadoop.hbase.MasterNotRunningException;
+
 
 import org.apache.hadoop.hbase.client.HTable;
 import org.apache.hadoop.hbase.client.Put;
-import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 
-import org.apache.hadoop.hbase.util.Bytes;
-import org.apache.hadoop.mapreduce.Job;
-
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.util.Bytes;
 
 import scala.Tuple2;
@@ -83,123 +67,6 @@ public class SparkStreamApp {
 
 	        JavaPairReceiverInputDStream<String, String> messages =
 	                KafkaUtils.createStream(jssc, zkQuorum, group, topicMap);
-	        
-	        
-	        /*
-
-	        JavaDStream<String> lines = messages.map(new Function<Tuple2<String, String>, String>() {
-	            @Override
-	            public String call(Tuple2<String, String> tuple2) {
-
-	                System.out.println("#1 " + tuple2.toString());
-	                return tuple2._2();
-	            }
-	        });
-
-	        JavaDStream<String> words = lines.flatMap(new FlatMapFunction<String, String>() {
-	            @Override
-	            public Iterator<String> call(String x) {
-	                return Arrays.asList(SPACE.split(x)).iterator();
-	            }
-	        });
-
-	        JavaPairDStream<String, Integer> wordCounts = words.mapToPair(
-	                new PairFunction<String, String, Integer>() {
-	                    @Override
-	                    public Tuple2<String, Integer> call(String s) {
-	                        return new Tuple2<>(s, 1);
-	                    }
-	                }).reduceByKey(new Function2<Integer, Integer, Integer>() {
-	            @Override
-	            public Integer call(Integer i1, Integer i2) {
-	                return i1 + i2;
-	            }
-	        });
-	        
-	        
-	        //--------------------------------------------------------------------------------------------
-	     // create connection with HBase
-	        Configuration config = null;
-	        try {
-	               config = HBaseConfiguration.create();
-	               config.set("hbase.zookeeper.quorum", "127.0.0.1");
-	               //config.set("hbase.zookeeper.property.clientPort","2181");
-	               //config.set("hbase.master", "127.0.0.1:60000");
-	               HBaseAdmin.checkHBaseAvailable(config);
-	               System.out.println("HBase is running!");
-	             } 
-	        catch (MasterNotRunningException e) {
-	                    System.out.println("HBase is not running!");
-	                    System.exit(1);
-	        }catch (Exception ce){ 
-	                ce.printStackTrace();
-	        }
-	        
-	        config.set(TableInputFormat.INPUT_TABLE, table);
-	        
-	     // new Hadoop API configuration
-	        Job newAPIJobConfiguration1 = Job.getInstance(config);
-	        newAPIJobConfiguration1.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, table);
-	        newAPIJobConfiguration1.setOutputFormatClass(org.apache.hadoop.hbase.mapreduce.TableOutputFormat.class);
-	       
-	     // create Key, Value pair to store in HBase
-	        JavaPairRDD<ImmutableBytesWritable, Put> hbasePuts = words.mapToPair(
-	            new PairFunction<Row, ImmutableBytesWritable, Put>() {
-	          @Override
-	          public Tuple2<ImmutableBytesWritable, Put> call(Row row) throws Exception {
-	               
-	             Put put = new Put(Bytes.toBytes(row.getString(0)));
-	             put.add(Bytes.toBytes("columFamily"), Bytes.toBytes("columnQualifier1"), Bytes.toBytes(row.getString(1)));
-	             put.add(Bytes.toBytes("columFamily"), Bytes.toBytes("columnQualifier2"), Bytes.toBytes(row.getString(2)));
-	           
-	                 return new Tuple2<ImmutableBytesWritable, Put>(new ImmutableBytesWritable(), put);     
-	          }
-	           });
-	           
-	        
-	        wordCounts.saveAsNewAPIHadoopDataset(newAPIJobConfiguration1.getConfiguration());
-
-	        /*
-	       wordCounts.foreachRDD((values, count) -> {
-	    	   values.foreach(new VoidFunction<Tuple2<String, Integer>> () {
-
-				@Override
-				public void call(Tuple2<String, Integer> tuple) throws Exception {
-				
-					
-				}});
-	       });
-	 
-	 */
-	 
-	 
-	 
-	 
-
-/*
- * wordCounts.foreach(new Function2<JavaPairRDD<String,Integer>, Time, Void>() {
-
-			@Override
-			public Void call(JavaPairRDD<String, Integer> values,
-					Time time) throws Exception {
-				
-				values.foreach(new VoidFunction<Tuple2<String, Integer>> () {
-
-					@Override
-					public void call(Tuple2<String, Integer> tuple)
-							throws Exception {
-						HBaseCounterIncrementor incrementor = 
-								HBaseCounterIncrementor.getInstance(broadcastTableName.value(), broadcastColumnFamily.value());
-						incrementor.increment("Counter", tuple._1(), tuple._2());
-						System.out.println("------------------------------- Counter:" + tuple._1() + "," + tuple._2());
-						
-					}} );
-				
-				return null;
-			}});
- */
-	        
-	//----------------------------------------------------------------------------
 
 	        JavaDStream<String> lines = messages.map(tuple2 -> {
 	            Configuration conf = HBaseConfiguration.create();
@@ -211,10 +78,13 @@ public class SparkStreamApp {
 	                put.add(Bytes.toBytes(columnFamily), Bytes.toBytes("column_info"), Bytes.toBytes(tuple2._2()));
 	                try {
 	                    table.put(put);
+	                    
+	                   
 	                } catch (IOException e) {
 	                    System.out.println("IOException" + e.getMessage());
 	                }
 	                System.out.println("write to table: " + tuple2.toString());
+	              //  table.close();
 	                return new String(tuple2._2());
 	        });
 	        
@@ -227,71 +97,6 @@ public class SparkStreamApp {
 	        JavaPairDStream<String, Integer> wordCounts = words
 	                .mapToPair(s -> new Tuple2<>(s, 1))
 	                .reduceByKey((i1,i2) -> i1 + i2);
-	        /*
-	        // create connection with HBase
-	        Configuration config = null;
-	        try {
-	               config = HBaseConfiguration.create();
-	               config.set("hbase.zookeeper.quorum", "127.0.0.1");
-	               config.set("hbase.zookeeper.property.clientPort","2181");
-	               config.set("hbase.master", "127.0.0.1:60000");
-	               config.set("zookeeper.znode.parent", "/hbase-unsecure");
-	               HBaseAdmin.checkHBaseAvailable(config);
-	               System.out.println("---------------------HBASE IS RUNNING!!!---------------------------");
-	             } 
-	        catch (MasterNotRunningException e) {
-	                    System.out.println("HBase is not running!");
-	                    System.exit(1);
-	        }catch (Exception ce){ 
-	                ce.printStackTrace();
-	        }
-	        
-	        config.set(TableInputFormat.INPUT_TABLE, table);
-	        
-	     // new Hadoop API configuration
-	        Job newAPIJobConfiguration1 = Job.getInstance(config);
-	        newAPIJobConfiguration1.getConfiguration().set(TableOutputFormat.OUTPUT_TABLE, table);
-	        newAPIJobConfiguration1.setOutputFormatClass(org.apache.hadoop.hbase.mapreduce.TableOutputFormat.class);
-	        
-	        
-	        JavaDStream<String> lines = messages.map(new Function<Tuple2<String, String>, String>() {
-	            @Override
-	            public String call(Tuple2<String, String> tuple2) {
-
-	                System.out.println("#1 " + tuple2.toString());
-	                return tuple2._2();
-	            }
-	        });
-	        
-	        
-	        JavaPairDStream<ImmutableBytesWritable, Put> hbasePuts= lines.mapToPair(
-                    new PairFunction<String, ImmutableBytesWritable, Put>(){
-
-                @Override
-                public Tuple2<ImmutableBytesWritable, Put> call(String line) {
-                    Put put = new Put(Bytes.toBytes("Rowkey" + Math.random()));
-                    put.add(Bytes.toBytes("firstFamily"), Bytes.toBytes("firstColumn"), Bytes.toBytes(line + "fc"));
-                    return new Tuple2<ImmutableBytesWritable, Put>(new ImmutableBytesWritable(), put);
-                 }
-                });
-
-/*
-	        hbasePuts.foreachRDD(new Function<JavaPairRDD<ImmutableBytesWritable, Put>, Void>() {
-                @Override
-                public Void call(JavaPairRDD<ImmutableBytesWritable, Put> hbasePutJavaPairRDD) throws Exception {
-                    hbasePutJavaPairRDD.saveAsNewAPIHadoopDataset(newAPIJobConfiguration1.getConfiguration());
-                    //hbasePutJavaPairRDD.saveAsNewAPIHadoopDataset(conf);
-                    return null;
-                }
-            });
-            
-        
-	        
-	        hbasePuts.foreachRDD(hbasePutJavaPairRDD -> {
-                    hbasePutJavaPairRDD.saveAsNewAPIHadoopDataset(newAPIJobConfiguration1.getConfiguration());  
-            });
-	            */
-	        
 
 	        wordCounts.print();
 	        jssc.start();
