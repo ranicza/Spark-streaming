@@ -72,7 +72,7 @@ public class SparkStreamApp {
 
 	        
 	        
-	        /*
+	    
 	        JavaDStream<String> lines = messages.map(tuple2 -> {
 	            Configuration conf = HBaseConfiguration.create();
 	            conf.set("hbase.zookeeper.property.clientPort", "2181");
@@ -93,10 +93,10 @@ public class SparkStreamApp {
 	                return new String(tuple2._2());
 	        });
 	        
-	        */
+	      
 	        
 	        
-	        
+	        /*
 	        // Split each line into fields
 	        JavaDStream<String> fields = messages.flatMap(line -> {
 	        	return Arrays.asList(line.toString().split(SPLIT)).iterator();
@@ -126,20 +126,20 @@ public class SparkStreamApp {
 	        });
 	        	      
 
-
+*/
 	        
 	        JavaDStream<String> lines1 = messages.map(tuple2 -> {
 	            System.out.println("#lines1: " + tuple2.toString());
 	            return tuple2._2();
 	        });
 
-	        /*
+	 
 	        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
 	        JavaPairDStream<String, Integer> wordCounts = words
 	                .mapToPair(s -> new Tuple2<>(s, 1))
 	                .reduceByKey((i1,i2) -> i1 + i2);
 	                 wordCounts.print();
-*/
+
 	       
 	        jssc.start();
 	        jssc.awaitTermination();
