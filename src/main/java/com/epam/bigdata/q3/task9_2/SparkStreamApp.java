@@ -38,6 +38,7 @@ import scala.Tuple2;
  */
 public class SparkStreamApp {
 	  private static final Pattern SPACE = Pattern.compile(" ");
+	  private static final String SPLIT = "\\s+";
 
 
 	    public static void main(String[] args) throws Exception {
@@ -68,6 +69,10 @@ public class SparkStreamApp {
 	        JavaPairReceiverInputDStream<String, String> messages =
 	                KafkaUtils.createStream(jssc, zkQuorum, group, topicMap);
 
+
+	        
+	        
+	        /*
 	        JavaDStream<String> lines = messages.map(tuple2 -> {
 	            Configuration conf = HBaseConfiguration.create();
 	            conf.set("hbase.zookeeper.property.clientPort", "2181");
@@ -88,20 +93,64 @@ public class SparkStreamApp {
 	                return new String(tuple2._2());
 	        });
 	        
+	        */
+	        
+	        
+	        
+	        // Split each line into fields
+	        JavaDStream<String> fields = messages.flatMap(line -> {
+	        	return Arrays.asList(line.toString().split(SPLIT)).iterator();
+	        });
+	        
+	        fields.foreachRDD(line ->
+	        	System.out.println(line)
+	        );
+	     
+	        
+	        
+	        JavaDStream<String> rows = messages.map(tuple2 -> {
+	            Configuration conf = getConfig();
+	            HTable table = new HTable(conf, tableName);
+	                Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
+	                put.add(Bytes.toBytes(columnFamily), Bytes.toBytes("column_info"), Bytes.toBytes(tuple2._2()));
+	                try {
+	                    table.put(put);
+	                    
+	                   
+	                } catch (IOException e) {
+	                    System.out.println("IOException" + e.getMessage());
+	                }
+	                System.out.println("write to table: " + tuple2.toString());
+	              //  table.close();
+	                return new String(tuple2._2());
+	        });
+	        	      
+
+
+	        
 	        JavaDStream<String> lines1 = messages.map(tuple2 -> {
 	            System.out.println("#lines1: " + tuple2.toString());
 	            return tuple2._2();
 	        });
 
+	        /*
 	        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
 	        JavaPairDStream<String, Integer> wordCounts = words
 	                .mapToPair(s -> new Tuple2<>(s, 1))
 	                .reduceByKey((i1,i2) -> i1 + i2);
-
-	        wordCounts.print();
+	                 wordCounts.print();
+*/
+	       
 	        jssc.start();
 	        jssc.awaitTermination();
 	   
 	    }
 	     
+        private static Configuration getConfig() {
+        	Configuration conf = HBaseConfiguration.create();
+            conf.set("hbase.zookeeper.property.clientPort", "2181");
+            conf.set("hbase.zookeeper.quorum", "sandbox.hortonworks.com");
+            conf.set("zookeeper.znode.parent", "/hbase-unsecure");
+            return conf;
+        }
 }
