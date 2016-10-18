@@ -1,9 +1,9 @@
 package com.epam.bigdata.q3.task9_2;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -93,6 +93,8 @@ public class SparkStreamApp {
 				"org.apache.spark.serializer.KryoSerializer");
 
 		JavaStreamingContext jssc = new JavaStreamingContext(sparkConf, new Duration(2000));
+		
+		jssc.checkpoint("hdfs://sandbox.hortonworks.com/tmp/admin/checkpoint");
 
 		Map<String, Integer> topicMap = new HashMap<>();
 		for (String topic : topics) {
@@ -117,7 +119,7 @@ public class SparkStreamApp {
 				
 				// iPinyou ID(*) + Timestamp            
 				String rowKey = fields[2] + "_" + fields[1];
-				
+
 				Put put = new Put(Bytes.toBytes(rowKey));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(BID_ID), Bytes.toBytes(fields[0]));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(TIMESTAMP_DATE), Bytes.toBytes(formatter.format(tmsFormatter.parse(fields[1]))));
@@ -125,7 +127,7 @@ public class SparkStreamApp {
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(USER_AGENT), Bytes.toBytes(fields[3]));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(IP), Bytes.toBytes(fields[4]));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(REGION), Bytes.toBytes(Integer.parseInt(fields[5])));
-				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(CITY), Bytes.toBytes(Integer.parseInt(fields[6])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(CITY), Bytes.toBytes(Long.parseLong(fields[6])));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(AD_EXCHANGE), Bytes.toBytes(Integer.parseInt(fields[7])));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(DOMAIN), Bytes.toBytes(fields[8]));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes(URL), Bytes.toBytes(fields[9]));
@@ -157,15 +159,8 @@ public class SparkStreamApp {
 			return new String(tuple2._2());
 		});
 
-		JavaDStream<String> lines1 = messages.map(tuple2 -> {
-			System.out.println("#lines1: " + tuple2.toString());
-			return tuple2._2();
-		});
-
-		JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
-		JavaPairDStream<String, Integer> wordCounts = words.mapToPair(s -> new Tuple2<>(s, 1))
-				.reduceByKey((i1, i2) -> i1 + i2);
-		wordCounts.print();
+		messages.checkpoint(new Duration(10000));
+		lines.print();
 
 		jssc.start();
 		jssc.awaitTermination();
