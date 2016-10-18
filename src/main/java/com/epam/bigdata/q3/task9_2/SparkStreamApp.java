@@ -47,7 +47,7 @@ public class SparkStreamApp {
 	private static final String SPLIT = "\\t";
 //	private static final String OS_NAME = "OS_NAME";
 //	private static final String DEVICE = "DEVICE";
-	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	// 2016-06-06 00:00:00
 
@@ -111,13 +111,14 @@ public class SparkStreamApp {
 			String device =  ua.getBrowser() != null ? ua.getOperatingSystem().getDeviceType().getName() : null;
 			String osName = ua.getBrowser() != null ? ua.getOperatingSystem().getName() : null;
 			
-			String date = formatter.format(fields[1]);
-			System.out.println("date: " + date);
+			Date date = formatter.parse(fields[1]);
+			//String date = formatter.format(fields[1]);
+			System.out.println("date: " + date.toString());
 			
 			Put put = new Put(Bytes.toBytes(rowKey));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[0]));
 //			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[1]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(date));
+			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(date.toString()));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ipinyou_Id"), Bytes.toBytes(fields[2]));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_agent"), Bytes.toBytes(fields[3]));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ip"), Bytes.toBytes(fields[4]));
