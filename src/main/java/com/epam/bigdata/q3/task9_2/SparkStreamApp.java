@@ -145,57 +145,11 @@ public class SparkStreamApp {
 	     
 	     
 	        // Split each line into fields
-	        JavaDStream<String> fields = messages.flatMap(line -> {
-	        	return Arrays.asList(line.toString().split(SPLIT)).iterator();
-	        });
+//	        JavaDStream<String> fields = messages.flatMap(line -> {
+//	        	return Arrays.asList(line.toString().split(SPLIT)).iterator();
+//	        });
 	        
-	        fields.foreachRDD(line ->
-	        	System.out.println(line)
-	        );
-	        
-	        
-	        
-	        JavaDStream<String> rows = fields.map(field-> {
-	            Configuration conf = getConfig();
-	            HTable table = new HTable(conf, tableName);
-	            Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
-                put.add(Bytes.toBytes(columnFamily), Bytes.toBytes("column_info"), Bytes.toBytes(field));
-	            		
-
-	                try {
-	                    table.put(put);
-	                    
-	                   
-	                } catch (IOException e) {
-	                    System.out.println("IOException" + e.getMessage());
-	                }
-	                System.out.println("write to table: " + field.toString());
-	              //  table.close();
-	                return new String(field);
-	        });
-	     
-	        
-	        /*
-	        JavaDStream<String> rows = messages.map(tuple2 -> {
-	            Configuration conf = getConfig();
-	            HTable table = new HTable(conf, tableName);
-	                Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
-	                put.add(Bytes.toBytes(columnFamily), Bytes.toBytes("column_info"), Bytes.toBytes(tuple2._2()));
-	                try {
-	                    table.put(put);
-	                    
-	                   
-	                } catch (IOException e) {
-	                    System.out.println("IOException" + e.getMessage());
-	                }
-	                System.out.println("write to table: " + tuple2.toString());
-	              //  table.close();
-	                return new String(tuple2._2());
-	        });
-	        	      
-
-*/
-	        
+ 
 	        JavaDStream<String> lines1 = messages.map(tuple2 -> {
 	            System.out.println("#lines1: " + tuple2.toString());
 	            return tuple2._2();
