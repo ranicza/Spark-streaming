@@ -112,46 +112,51 @@ public class SparkStreamApp {
 			String device =  ua.getBrowser() != null ? ua.getOperatingSystem().getDeviceType().getName() : null;
 			String osName = ua.getBrowser() != null ? ua.getOperatingSystem().getName() : null;
 			
-			Date date = tmsFormatter.parse(fields[1]);
+			//Date date = tmsFormatter.parse(fields[1]);
 			//String date = formatter.format(fields[1]);
-			System.out.println("date: " + formatter.format(date));
 			
-			Put put = new Put(Bytes.toBytes(rowKey));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[0]));
-//			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[1]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(formatter.format(date)));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ipinyou_Id"), Bytes.toBytes(fields[2]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_agent"), Bytes.toBytes(fields[3]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ip"), Bytes.toBytes(fields[4]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("region"), Bytes.toBytes(Integer.parseInt(fields[5])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("city"), Bytes.toBytes(Integer.parseInt(fields[6])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_exchange"), Bytes.toBytes(Integer.parseInt(fields[7])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("domain"), Bytes.toBytes(fields[8]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("url"), Bytes.toBytes(fields[9]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("anonymous_url_id"), Bytes.toBytes(fields[10]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_id"), Bytes.toBytes(fields[11]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_width"), Bytes.toBytes(Integer.parseInt(fields[12])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_height"), Bytes.toBytes(Integer.parseInt(fields[13])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_visibility"), Bytes.toBytes(Integer.parseInt(fields[14])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_format"), Bytes.toBytes(Integer.parseInt(fields[15])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("paying_price"), Bytes.toBytes(Integer.parseInt(fields[16])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("creative_id"), Bytes.toBytes(fields[17]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bidding_price"), Bytes.toBytes(Integer.parseInt(fields[18])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("advertiser_id"), Bytes.toBytes(Integer.parseInt(fields[19])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_tags"), Bytes.toBytes(Long.parseLong(fields[20])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("stream_id"), Bytes.toBytes(Integer.parseInt(fields[21])));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("device"), Bytes.toBytes(device));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("os_name"), Bytes.toBytes(osName));
-			try {
-				table.put(put);
+			// formatter.format(tmsFormatter.parse(fields[1]))
+			
+			if ("null".equals(fields[2])) {
+				Put put = new Put(Bytes.toBytes(rowKey));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[0]));
+//				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[1]));
+				//put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(formatter.format(date)));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(formatter.format(tmsFormatter.parse(fields[1]))));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ipinyou_Id"), Bytes.toBytes(fields[2]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_agent"), Bytes.toBytes(fields[3]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ip"), Bytes.toBytes(fields[4]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("region"), Bytes.toBytes(Integer.parseInt(fields[5])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("city"), Bytes.toBytes(Integer.parseInt(fields[6])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_exchange"), Bytes.toBytes(Integer.parseInt(fields[7])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("domain"), Bytes.toBytes(fields[8]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("url"), Bytes.toBytes(fields[9]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("anonymous_url_id"), Bytes.toBytes(fields[10]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_id"), Bytes.toBytes(fields[11]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_width"), Bytes.toBytes(Integer.parseInt(fields[12])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_height"), Bytes.toBytes(Integer.parseInt(fields[13])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_visibility"), Bytes.toBytes(Integer.parseInt(fields[14])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ad_slot_format"), Bytes.toBytes(Integer.parseInt(fields[15])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("paying_price"), Bytes.toBytes(Integer.parseInt(fields[16])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("creative_id"), Bytes.toBytes(fields[17]));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bidding_price"), Bytes.toBytes(Integer.parseInt(fields[18])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("advertiser_id"), Bytes.toBytes(Integer.parseInt(fields[19])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_tags"), Bytes.toBytes(Long.parseLong(fields[20])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("stream_id"), Bytes.toBytes(Integer.parseInt(fields[21])));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("device"), Bytes.toBytes(device));
+				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("os_name"), Bytes.toBytes(osName));
+				try {
+					table.put(put);
 
-			} catch (IOException e) {
-				System.out.println("IOException" + e.getMessage());
+				} catch (IOException e) {
+					System.out.println("IOException" + e.getMessage());
+				}
+				System.out.println("write to table: " + tuple2.toString());
+				// table.close();
+				
 			}
-			System.out.println("write to table: " + tuple2.toString());
-			// table.close();
+			
 			return new String(tuple2._2());
-
 		});
 
 		JavaDStream<String> lines1 = messages.map(tuple2 -> {
