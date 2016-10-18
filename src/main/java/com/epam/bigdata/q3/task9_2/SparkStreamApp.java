@@ -167,7 +167,12 @@ public class SparkStreamApp {
 	                .reduceByKey((i1,i2) -> i1 + i2);
 	                 wordCounts.print();
 */
-	       
+	        JavaDStream<String> words = lines.flatMap(x -> Arrays.asList(SPACE.split(x)).iterator());
+	        JavaPairDStream<String, Integer> wordCounts = words
+	                .mapToPair(s -> new Tuple2<>(s, 1))
+	                .reduceByKey((i1,i2) -> i1 + i2);
+	                 wordCounts.print();
+	                 
 	        jssc.start();
 	        jssc.awaitTermination();
 	   
