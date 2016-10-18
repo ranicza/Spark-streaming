@@ -43,13 +43,17 @@ import scala.Tuple2;
  *
  */
 public class SparkStreamApp {
+	private static SimpleDateFormat tmsFormatter = new SimpleDateFormat("yyyyMMddhhmmss");
+	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	
 	private static final Pattern SPACE = Pattern.compile(" ");
 	private static final String SPLIT = "\\t";
 //	private static final String OS_NAME = "OS_NAME";
 //	private static final String DEVICE = "DEVICE";
-	private static SimpleDateFormat tmsFormatter = new SimpleDateFormat("yyyyMMddhhmmss");
-	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	
+
+	private static final String BID_ID= "bid_Id";
+	private static final String
+	private static final String
 	// 2016-06-06 00:00:00
 
 	public static void main(String[] args) throws Exception {
@@ -105,8 +109,7 @@ public class SparkStreamApp {
 			// Split each line into fields
 			String[] fields = tuple2._2().toString().split(SPLIT);
 			
-			// iPinyou ID(*) + Timestamp            
-			String rowKey = fields[2] + "_" + fields[1];
+
 			
 			UserAgent ua = UserAgent.parseUserAgentString(fields[3]);
 			String device =  ua.getBrowser() != null ? ua.getOperatingSystem().getDeviceType().getName() : null;
@@ -117,7 +120,10 @@ public class SparkStreamApp {
 			
 			// formatter.format(tmsFormatter.parse(fields[1]))
 			
-			if ("null".equals(fields[2])) {
+			if (!"null".equals(fields[2])) {
+				// iPinyou ID(*) + Timestamp            
+				String rowKey = fields[2] + "_" + fields[1];
+				
 				Put put = new Put(Bytes.toBytes(rowKey));
 				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[0]));
 //				put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[1]));
