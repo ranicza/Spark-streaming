@@ -52,8 +52,8 @@ public class SparkStreamApp {
 //	private static final String DEVICE = "DEVICE";
 
 	private static final String BID_ID= "bid_Id";
-	private static final String
-	private static final String
+//	private static final String
+//	private static final String
 	// 2016-06-06 00:00:00
 
 	public static void main(String[] args) throws Exception {
