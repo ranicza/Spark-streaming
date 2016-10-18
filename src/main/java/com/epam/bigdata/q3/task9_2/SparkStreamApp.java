@@ -47,6 +47,7 @@ public class SparkStreamApp {
 	private static final String SPLIT = "\\t";
 //	private static final String OS_NAME = "OS_NAME";
 //	private static final String DEVICE = "DEVICE";
+	private static SimpleDateFormat tmsFormatter = new SimpleDateFormat("yyyyMMddhhmmss");
 	private static SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 	
 	// 2016-06-06 00:00:00
@@ -111,14 +112,14 @@ public class SparkStreamApp {
 			String device =  ua.getBrowser() != null ? ua.getOperatingSystem().getDeviceType().getName() : null;
 			String osName = ua.getBrowser() != null ? ua.getOperatingSystem().getName() : null;
 			
-			Date date = formatter.parse(fields[1]);
+			Date date = tmsFormatter.parse(fields[1]);
 			//String date = formatter.format(fields[1]);
-			System.out.println("date: " + date.toString());
+			System.out.println("date: " + formatter.format(date));
 			
 			Put put = new Put(Bytes.toBytes(rowKey));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[0]));
 //			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[1]));
-			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(date.toString()));
+			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(formatter.format(date)));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ipinyou_Id"), Bytes.toBytes(fields[2]));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_agent"), Bytes.toBytes(fields[3]));
 			put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("ip"), Bytes.toBytes(fields[4]));
@@ -152,11 +153,6 @@ public class SparkStreamApp {
 			return new String(tuple2._2());
 
 		});
-
-		// Split each line into fields
-		// JavaDStream<String> fields = messages.flatMap(line -> {
-		// return Arrays.asList(line.toString().split(SPLIT)).iterator();
-		// });
 
 		JavaDStream<String> lines1 = messages.map(tuple2 -> {
 			System.out.println("#lines1: " + tuple2.toString());
