@@ -102,12 +102,11 @@ public class SparkStreamApp {
 	            conf.set("hbase.zookeeper.quorum", "sandbox.hortonworks.com");
 	            conf.set("zookeeper.znode.parent", "/hbase-unsecure");
 	          HTable table = new HTable(conf, tableName);
-	          
+	          System.out.println( tuple2._2());
 	    	  // Split each line into fields
-	    	 String[] fields = tuple2._2().toString().split(SPLIT);  
+	    	  String[] fields = tuple2._2().toString().split(SPLIT);  
 //	    	  String rowKey = fields[0]; 	    	      	  
 //	    	  Put put = new Put(Bytes.toBytes(rowKey));			
-	    	 
 	    	 
 	    	  Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[1]));
@@ -131,7 +130,7 @@ public class SparkStreamApp {
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bidding_price"), Bytes.toBytes(fields[19]));
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("advertiser_id"), Bytes.toBytes(fields[20]));
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("user_tags"), Bytes.toBytes(fields[21]));
-              put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("stream_id"), Bytes.toBytes(fields[22]));
+            //  put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("stream_id"), Bytes.toBytes(fields[22]));
               try {
                   table.put(put);
                   
