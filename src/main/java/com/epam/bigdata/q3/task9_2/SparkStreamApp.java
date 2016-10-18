@@ -104,10 +104,11 @@ public class SparkStreamApp {
 	          HTable table = new HTable(conf, tableName);
 	          
 	    	  // Split each line into fields
-	    	  String[] fields = tuple2._2().toString().split(SPLIT);  
+	    	 String[] fields = tuple2._2().toString().split(SPLIT);  
 //	    	  String rowKey = fields[0]; 	    	      	  
 //	    	  Put put = new Put(Bytes.toBytes(rowKey));			
-	    	  
+	    	 
+	    	 
 	    	  Put put = new Put(Bytes.toBytes(new java.util.Date().getTime()));
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("bid_Id"), Bytes.toBytes(fields[1]));
               put.addColumn(Bytes.toBytes(columnFamily), Bytes.toBytes("timestamp_data"), Bytes.toBytes(fields[2]));
