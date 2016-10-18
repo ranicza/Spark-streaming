@@ -96,7 +96,11 @@ public class SparkStreamApp {
 	        
 	      */
 	      JavaDStream<String> lines = messages.map(tuple2 -> {
-	    	  Configuration conf = getConfig();
+	    	//  Configuration conf = getConfig();
+	         	Configuration conf = HBaseConfiguration.create();
+	            conf.set("hbase.zookeeper.property.clientPort", "2181");
+	            conf.set("hbase.zookeeper.quorum", "sandbox.hortonworks.com");
+	            conf.set("zookeeper.znode.parent", "/hbase-unsecure");
 	          HTable table = new HTable(conf, tableName);
 	          
 	    	  // Split each line into fields
